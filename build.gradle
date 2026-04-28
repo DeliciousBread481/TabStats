@@ -68,9 +68,9 @@ dependencies {
   
     implementation fg.deobf("curse.maven:jade-324717:4573193")
     
-    compileOnly fg.deobf(files('libs/bml-1.20-1.1.8.jar'))
-    shadowCompileOnly fg.deobf(files('libs/bml-1.20-1.1.8.jar'))  
-    runtimeOnly fg.deobf(files('libs/bml-1.20-1.1.8.jar'))  
+    compileOnly fg.deobf(files('libs/bml-1.20.1-1.1.8.jar'))
+    shadowCompileOnly fg.deobf(files('libs/bml-1.20.1-1.1.8.jar'))  
+    runtimeOnly fg.deobf(files('libs/bml-1.20.1-1.1.8.jar'))  
 }  
   
 jar {  
