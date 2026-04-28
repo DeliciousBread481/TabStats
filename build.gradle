@@ -46,6 +46,7 @@ minecraft {
   
 repositories {  
     maven { url = 'https://maven.minecraftforge.net/' }
+    maven { url "https://cursemaven.com" }
     maven { url = 'https://maven.parchmentmc.org' }  
     maven {  
         name = "Progwml6 maven"  
@@ -55,13 +56,17 @@ repositories {
         name = "ModMaven"  
         url = "https://modmaven.k-4u.nl"  
     }  
+    maven {
+        name = "Snownee"
+        url = "https://maven.snownee.com/releases"
+    }
     mavenLocal()  
 }  
   
 dependencies {  
     minecraft "net.minecraftforge:forge:${project.mc_version}-${project.forge_version}"  
   
-    implementation fg.deobf("snownee:jade:11.9.2")
+    implementation fg.deobf("curse.maven:jade-324717:4573193")
   
     shadowCompileOnly fg.deobf(files('libs/bml-1.20-1.1.8-b1.jar'))  
     runtimeOnly fg.deobf(files('libs/bml-1.20-1.1.8-b1.jar'))  
