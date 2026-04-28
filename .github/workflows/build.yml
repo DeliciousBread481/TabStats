@@ -12,14 +12,16 @@ jobs:
     runs-on: ubuntu-latest  
   
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          
       - name: Check if BML jar exists  
         run: |  
           ls -la libs/  
           file libs/bml-1.20.1-1.1.8.jar || echo "BML jar not found"
-    
-      - name: Checkout  
-        uses: actions/checkout@v4  
-  
+          
       - name: Set up Java 17  
         uses: actions/setup-java@v4  
         with:  
