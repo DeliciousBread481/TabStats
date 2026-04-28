@@ -1,207 +1,82 @@
-plugins {
-    id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
-}
-
-apply from: 'https://raw.githubusercontent.com/Crimix/bml/1.20/common.gradle'
-apply from: 'https://raw.githubusercontent.com/Crimix/bml/1.20/shadow.gradle'
-
+plugins {  
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'  
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'  
+}  
+  
+apply from: 'https://raw.githubusercontent.com/Crimix/bml/1.20/common.gradle'  
+apply from: 'https://raw.githubusercontent.com/Crimix/bml/1.20/shadow.gradle'  
+  
 version = version_major + '.' + version_minor + '.' + version_patch
-group = mod_group
-base {
-    archivesName = mod_archivesBaseName + "-" + mc_version
-}
-
-// Mojang ships Java 17 to end users in 1.18+ instead of Java 16 in 1.17 so your mod should target Java 17.
+group = mod_group  
+base {  
+    archivesName = mod_archivesBaseName + "-" + mc_version  
+}  
+  
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
-minecraft {
-// The mappings can be changed at any time and must be in the following format.
-    // Channel:   Version:
-    // official   MCVersion             Official field/method names from Mojang mapping files
-    // parchment  YYYY.MM.DD-MCVersion  Open community-sourced parameter names and javadocs layered on top of official
-    //
-    // You must be aware of the Mojang license when using the 'official' or 'parchment' mappings.
-    // See more information here: https://github.com/MinecraftForge/MCPConfig/blob/master/Mojang.md
-    //
-    // Parchment is an unofficial project maintained by ParchmentMC, separate from MinecraftForge
-    // Additional setup is needed to use their mappings: https://parchmentmc.org/docs/getting-started
-    //
-    // Use non-default mappings at your own risk. They may not always work.
-    // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: mappings_channel, version: mappings_version
-
-    // When true, this property will have all Eclipse run configurations run the "prepareX" task for the given run configuration before launching the game.
-    // In most cases, it is not necessary to enable.
-    // enableEclipsePrepareRuns = true
-
-    // When true, this property will have all IntelliJ IDEA run configurations run the "prepareX" task for the given run configuration before launching the game.
-    // In most cases, it is not necessary to enable.
-    // enableIdeaPrepareRuns = true
-
-    // This property allows configuring Gradle's ProcessResources task(s) to run on IDE output locations before launching the game.
-    // It is REQUIRED to be set to true for this template to function.
-    // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
-    copyIdeResources = true
-
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
-    // Default run configurations.
-    // These can be tweaked, removed, or duplicated as needed.
-    runs {
-        client {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            // The markers can be changed as needed.
-            // "SCAN": For mods scan.
-            // "REGISTRIES": For firing of registry events.
-            // "REGISTRYDUMP": For getting the contents of all registries.
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            // Disable mixin refmaps
-            property 'mixin.env.disableRefMap', 'true'
-
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+  
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))  
+minecraft {  
+    mappings channel: mappings_channel, version: mappings_version  
+    copyIdeResources = true  
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')  
+  
+    runs {  
+        client {  
+            workingDirectory project.file('run')  
+            property 'forge.logging.markers', 'REGISTRIES'  
+            property 'forge.logging.console.level', 'debug'  
+            property 'mixin.env.disableRefMap', 'true'  
+            property 'forge.enabledGameTestNamespaces', mod_id  
+            mods {  
+                "${mod_id}" { source sourceSets.main }  
+            }  
+        }  
+        server {  
+            workingDirectory project.file('run')  
+            property 'forge.logging.markers', 'REGISTRIES'  
+            property 'forge.logging.console.level', 'debug'  
+            property 'mixin.env.disableRefMap', 'true'  
             property 'forge.enabledGameTestNamespaces', mod_id
-
             mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-        dev {
-            parent runs.client
-            taskName 'runDev'
-            args '--username', 'Dev2'
-        }
-        server {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'mixin.env.disableRefMap', 'true'
-            property 'forge.enabledGameTestNamespaces', mod_id
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-        // This run config launches GameTestServer and runs all registered gametests, then exits.
-        // By default, the server will crash when no gametests are provided.
-        // The gametest system is also enabled by default for other run configs under the /test command.
-        gameTestServer {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', mod_id
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-        data {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'mixin.env.disableRefMap', 'true'
-            property 'forge.enabledGameTestNamespaces', mod_id
-
-            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', mod_id, '--all', '--output', file('src/main/generated_resources'), '--existing', file('src/main/resources/')
-
-            mods {
-                "${mod_id}"  {
-                    source sourceSets.main
-                }
-            }
-        }
-    }
-}
-
-repositories {
-    maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.k-4u.nl"
-    }
-    maven {
-        name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/crimix/bml")
-        credentials {
-            username = github_user
-            password = github_token
-        }
-        content {
-            includeGroup "com.black_dog20.bml"
-        }
-    }
-    mavenLocal()
-}
-
-dependencies {
-    minecraft "net.minecraftforge:forge:${project.mc_version}-${project.forge_version}"
-
-    implementation fg.deobf("curse.maven:jade-324717:${jade_version}")
-    shadowCompileOnly fg.deobf("com.black_dog20.bml:bml:${bml_version}")
-    runtimeOnly fg.deobf("com.black_dog20.bml:bml:${bml_version}")
-}
-
-jar {
-    manifest {
-        attributes(["Specification-Title": "tabstats",
-                    "Specification-Vendor": "black_dog20",
-                    "Specification-Version": "1",  // We are version 1 of ourselves
-                    "Implementation-Title": "Tab Stats",
-                    "Implementation-Version": archiveVersion.get(),
-                    "Implementation-Vendor" :"black_dog20",
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
-    }
-}
-
-shadowJar {
-    configurations = [project.configurations.shadowCompileOnly]
-    relocate 'com.black_dog20.bml', 'com.black_dog20.tabstats.repack.bml'
-}
-
-curseforge {
-    apiKey = curse_apiKey
-    project {
-        id = '521717'
-        changelogType = 'markdown'
-        changelog = "As always find the changelog here [CHANGELOG](${changelog_url})"
-        releaseType = 'release'
-        addGameVersion 'Forge'
-        addGameVersion 'Java 17'
-        addGameVersion '1.20'
-        addGameVersion '1.20.1'
-    }
-}
-
-modrinth {
-    token = modrinth_token
-    projectId = "zWtYC4e6"
-    uploadFile = jar
-    versionNumber = "${mc_version}-${version}"
-    changelog = "As always find the changelog here [CHANGELOG](${changelog_url})"
-    versionType = "release"
-    loaders = ["forge"]
-    gameVersions = ["1.20", "1.20.1"]
+                "${mod_id}" { source sourceSets.main }
+            }  
+        }  
+    }  
+}  
+  
+repositories {  
+    maven {  
+        name = "Progwml6 maven"  
+        url = "https://dvs1.progwml6.com/files/maven/"  
+    }  
+    maven {  
+        name = "ModMaven"  
+        url = "https://modmaven.k-4u.nl"  
+    }  
+    mavenLocal()  
+}  
+  
+dependencies {  
+    minecraft "net.minecraftforge:forge:${project.mc_version}-${project.forge_version}"  
+  
+    implementation fg.deobf("curse.maven:jade-324717:${jade_version}")  
+    shadowCompileOnly fg.deobf(files('libs/bml-1.20-1.1.8-b1.jar'))  
+    runtimeOnly fg.deobf(files('libs/bml-1.20-1.1.8-b1.jar'))  
+}  
+  
+jar {  
+    manifest {  
+        attributes(["Specification-Title"      : "tabstats",  
+                    "Specification-Vendor"      : "black_dog20",  
+                    "Specification-Version"     : "1",  
+                    "Implementation-Title"      : "Tab Stats",  
+                    "Implementation-Version"    : archiveVersion.get(),  
+                    "Implementation-Vendor"     : "black_dog20",  
+                    "Implementation-Timestamp"  : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)  
+    }  
+}  
+  
+shadowJar {  
+    configurations = [project.configurations.shadowCompileOnly]  
+    relocate 'com.black_dog20.bml', 'com.black_dog20.tabstats.repack.bml'  
 }
