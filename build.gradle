@@ -42,7 +42,15 @@ minecraft {
             }  
         }  
     }  
-}  
+}
+
+sourceSets {  
+    main {  
+        resources {  
+            srcDir 'src/main/generated_resources'  
+        }  
+    }  
+}
   
 repositories {  
     maven { url = 'https://maven.minecraftforge.net/' }
@@ -61,8 +69,8 @@ repositories {
         url = "https://maven.snownee.com/releases"
     }
     mavenLocal()  
-}  
-  
+} 
+
 dependencies {  
     minecraft "net.minecraftforge:forge:${project.mc_version}-${project.forge_version}"  
   
@@ -71,7 +79,19 @@ dependencies {
     compileOnly fg.deobf(files('libs/bml-1.20.1-1.1.8.jar'))
     shadowCompileOnly fg.deobf(files('libs/bml-1.20.1-1.1.8.jar'))  
     runtimeOnly fg.deobf(files('libs/bml-1.20.1-1.1.8.jar'))  
-}  
+}
+
+processResources {  
+    filesMatching('META-INF/mods.toml') {  
+        expand(  
+            'version': project.version,  
+            'loader_version_range': project.findProperty('placeholder.loader_version_range'),  
+            'forge_version_range': project.findProperty('placeholder.forge_version_range'),  
+            'minecraft_version_range': project.findProperty('placeholder.minecraft_version_range'),  
+            'update_url': project.findProperty('placeholder.update_url')  
+        )  
+    }  
+}
   
 jar {  
     manifest {  
